@@ -1,0 +1,152 @@
+
+############## 
+Konfiguracja statycznych oraz domyślnych tras routingu IPv4
+##############
+
+
+ZADANIE 2 
+
+KROK 2
+d) 
+Czy wynik polecenia ping wysłanego z komputera PC-A na komputer PC-B był pozytywny? Nie 
+Czy wynik polecenia ping wysłanego z komputera PC-C na komputer PC-B był pozytywny? Nie
+Dlaczego? Ponieważ sieć 209.165.201.0/24 nie jest rozgłaszana przed router r2.
+
+Czy wynik polecenia ping wysłanego z komputera PC-A na komputer PC-C był pozytywny? Nie
+Czy wynik polecenia ping wysłanego z komputera PC-C na komputer PC-A był pozytywny? Nie
+Dlaczego? Ponieważ dochodzi do klasyfikowania/sumaryzacji sieci. Router R2 połączył 2 różne sieci w jedną oraz w tabeli routingu posiada wpisy o 2 interfejsach wyjściowych dla tej "wspólnej sieci".
+
+e) 
+Po wydaniu komendy debug ip rip na R2 jakie informacje potwierdzają że RIPv2 działa? 
+ "RIP protocol debugging is on" oraz co jakiś czas przychodzą wiadomości/aktualizacje od innych routerów oraz takie wiadomości są wysyłane. "R2#RIP: received v2 update from 10.2.2.1 on Serial0/0/1"
+
+Po wydaniu komendy show run na R2 jakie informacje potwierdzają że RIPv2 działa? 
+  router rip
+   version 2
+   network 10.0.0.0
+f) 
+Użyj komendy debug ip rip na ruterze R2 w celu określenia tras otrzymywanych w aktualizacjach od R3:
+  R2#RIP: received v2 update from 10.2.2.1 on Serial0/0/1
+        172.30.0.0/16 via 0.0.0.0 in 1 hops
+
+Krok 3
+j)
+Jakie trasy znajdują się w aktualizacjach wysyłanych przez R3? "172.30.30.0/24 via 0.0.0.0 in 1 hops"
+Czy maski podsieci są również zawarte w aktualizacjach RIP? Tak
+
+Krok 5
+l)
+W jaki sposób urządzenia z sieci LAN ruterów R1 i R3 łączą się z zewnętrzną siecią Internet? 
+  Wysyłają pakiety do swoich bram domyślnych, czli ruterów R1 i R3, które wyszukują docelowego adresu ip w tablicy routingu, gdy nie znajdują pasującej sieci, wysyłają pakiet trasą domyślną do routera R2, który następnie wysyła ruch na komputer PC-B.
+m) 
+Jak jest wyświetlona trasa do sieci Internet w tablicy rutingu R2? 
+  S*   0.0.0.0/0 [1/0] via 209.165.201.2
+
+Krok 6
+n) 
+Zasymuluj ruch do Internetu poprzez użycie polecenia ping na adres 209.165.201.2 z komputerów PC-A i PC-C. Czy wynik polecenia ping był pozytywny? Tak
+o) 
+Sprawdź czy komputery z podsieci mogą się ze sobą połączyć używając polecenia ping z pomiędzy PC-A i PC-C. Czy wynik polecenia ping był pozytywny? Tak
+
+
+ZADANIE 3
+
+Krok 2
+c) show ipv6 interface brief
+
+ZADANIE 4
+
+Krok 1
+d)
+W jaki sposób wyświetlana jest informacja o protokole RIPng?
+  IPv6 Routing Protocol is "ND" 
+e) 
+Polecenie "show ipv6 rip Test1" nie działa"
+
+Jakie są podobieństwa RIPv2 i RIPng? Są niemalże identyczne, ponieważ RIPng bazuje na RIPv2. Ma tą samą odległość administracyjną i ten sam limit przeskoków równy 15. 
+
+f) 
+Wyświetl tabelę rutingu IPv6 na każdym ruterze.
+  show ipv6 route
+
+Ile tras RIPng jest obecnych na ruterze R1? 2
+Ile tras RIPng jest obecnych na ruterze R2? 2
+Ile tras RIPng jest obecnych na ruterze R3? 2 
+g) 
+Czy jest możliwa komunikacja z PC-A do PC-B? Nie
+Czy jest możliwa komunikacja z PC-A do PC-C? Tak
+Czy jest możliwa komunikacja z PC-C do PC-B? Nie
+Czy jest możliwa komunikacja z PC-C do PC-A? Tak
+Dlaczego niektóre wyniki są pozytywne a niektóre nie? 
+  Ponieważ sieć na interfejsie g0/0 rutera R2 nie jest rozgłaszana.
+
+Krok 2
+h)
+  ipv6 route ::0/64 2001:DB8:ACAD:B::B
+
+Krok 3
+j) 
+Bazując na tablicy rutingu R2 odpowiedz na pytanie jakiej trasy używa ruter R2 łącząc się z Internetem?
+  Trasy statycznej o adresie 2001:DB8:ACAD:B::B
+  S   ::/64 [1/0]
+     via 2001:DB8:ACAD:B::B
+k) 
+Jakich tras używają rutery R1 i R3 łącząc się z zewnętrzną siecią Internet? 
+  Tras dynamicznych
+
+  R   ::/0 [120/2]
+     via FE80::2, Serial0/0/0
+
+  R   ::/0 [120/2]
+     via FE80::2, Serial0/0/1
+
+Krok 4
+Czy wyniki były pozytywne? Tak
+
+DO PRZEMYŚLENIA 
+1. Dlaczego wyłącza się automatyczną sumaryzację dla rutingu bazującego na protokole RIPv2? 
+	Ponieważ może dojść do niechcianego zjawiska load-balancingu.
+2. Jak w obydwu przypadkach rutery R1 i R3 nauczyły się trasy do Internetu? 
+	Rutery dostały aktualizację zawierającą informację o nowej trasie.
+3. Czym różni się proces konfiguracji RIPv2 od konfiguracji RIPng? 
+	Podczas konfiguracji RIPng, należy go włączyć na konkretnym interfejsie, a nie w trybie konfiguracji routera. 
+	
+
+####################
+Projektowanie adresacji IPv4 z maskami o różnej długości VLSM
+####################
+Ćwiczenie było wykonywane na laboratorium nr 4 zgodnie z zaleceniem:
+"Do ćwiczenia 4c w pliku z odpowiedziami proszę przesłać tylko uzupełnione tabelki ze strony 4 instrukcji."
+
+
+Opis				Liczba hostów	Adres sieci		Adres pierw. hosta	Adres rozgłoszeniowy
+HQ G0/0 (F0/0)			16,000		172.16.128.0/18		172.16.128.1		172.16.128.255
+HQ G0/1 (F0/1)			8,000		172.16.192.0/19		172.16.192.1		172.16.192.255
+BR1 G0/1 (F0/1)			4,000		172.16.224.0/20		172.16.224.1		172.16.224.255
+BR1 G0/0 (F0/0)			2,000		172.16.240.0/21		172.16.240.1		172.16.240.255
+BR2 G0/1 (F0/1)			1,000		172.16.248.0/22		172.16.248.1		172.16.248.255
+BR2 G0/0 (F0/0)			500		172.16.252.0/23		172.16.252.1		172.16.252.255
+HQ S0/0/0 - BR1 S0/0/0		2		172.16.254.0/30		172.16.254.1		172.16.254.3
+HQ S0/0/1 - BR2 S0/0/1		2		172.16.254.4/30		172.16.254.5		172.16.254.7
+BR1 S0/0/1 - BR2 S0/0/0		2		172.16.254.8/30		172.16.254.9		172.16.254.11
+
+
+
+Urządzenie	Interfejs	Adres IP	Maska podsieci		Interfejs urządzenia
+
+		G0/0		172.16.128.1	255.255.192.0		16,000 Host LAN
+HQ		G0/1		172.16.192.1	255.255.224.0		8,000 Host LAN
+		S0/0/0		172.16.254.1	255.255.255.252		BR1 S0/0/0
+		S0/0/1		172.16.254.5	255.255.255.252		BR2 S0/0/1
+
+		G0/0		172.16.240.1	255.255.248.0		2,000 Host LAN
+BR1		G0/1		172.16.224.1	255.255.240.0		4,000 Host LAN
+		S0/0/0		172.16.254.2	255.255.255.252		HQ S0/0/0
+		S0/0/1		172.16.254.9	255.255.255.252		BR2 S0/0/0
+
+		G0/0		172.16.252.1	255.255.254.0		500 Host LAN
+BR2		G0/1		172.16.248.1	255.255.252.0		1,000 Host LAN
+		S0/0/0		172.16.254.10	255.255.255.252		BR1 S0/0/1
+		S0/0/1		172.16.254.6	255.255.255.252		HQ S0/0/1
+
+
